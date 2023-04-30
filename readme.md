@@ -40,4 +40,4 @@ npm run serve
 
 2. change app configuration
 
-Navigate to https://api.slack.com/apps/ and under event-subscriptions, change the events-url to [ngrok-url]/test-project-5679/europe-west1/slack/slack/events
+Navigate to https://api.slack.com/apps/ and under event-subscriptions, change the events-url to [ngrok-url]/[firebase-project]/europe-west1/slack/slack/events
