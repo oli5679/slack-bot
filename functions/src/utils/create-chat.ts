@@ -2,7 +2,7 @@ import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from "openai";
 import { logger } from "firebase-functions";
 import { AuthTestResponse } from "@slack/web-api";
 
-import { SlackThread } from "../interface";
+import { SlackMessage } from "../interface";
 
 export class OpenAIChat {
     private apiKey: string;
@@ -16,9 +16,9 @@ export class OpenAIChat {
         this.openai = new OpenAIApi(configuration);
     }
 
-    public async createChat(slackThread: SlackThread) {
+    public async createChat(slackThread: Array<SlackMessage>) {
         const botUserId = (await this.botUserPromise).user_id as string;
-        const messages: ChatCompletionRequestMessage[] = slackThread.messages!.map((message) => {
+        const messages: ChatCompletionRequestMessage[] = slackThread!.map((message) => {
             return {
                 role: message.user === botUserId ? "assistant" : "user",
                 content: message.text || "",

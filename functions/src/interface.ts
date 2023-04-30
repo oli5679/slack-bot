@@ -10,7 +10,6 @@ export interface SlackReaction {
     userId: string;
     reaction: string;
     messageTs: string;
-    threadTs: string;
 }
 
 export interface SlackThread {
