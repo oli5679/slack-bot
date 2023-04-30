@@ -1,10 +1,10 @@
 import { App, ExpressReceiver, SlackEventMiddlewareArgs } from "@slack/bolt";
 import { logger } from "firebase-functions";
 
-import { SlackMessage, SlackReaction, SlackThread } from "./interface";
-import { saveMessage, saveReaction } from "./utils/firestore";
-
+import { SlackMessage, SlackReaction } from "./interface";
+import { saveMessage, saveReaction, getMessages } from "./utils/firestore";
 import { OpenAIChat } from "./utils/create-chat";
+import { timestamp } from "./utils/timestamp";
 
 
 export const initializeSlackApp = (token: string, signingSecret: string, openAiKey: string) => {
@@ -26,41 +26,33 @@ export const initializeSlackApp = (token: string, signingSecret: string, openAiK
             ts: event.ts,
         };
 
-        // todo look up all thread
-        const thread: SlackThread = {
-            messages: [message],
-        };
+        const threadTs = event.thread_ts || event.ts;
+        await saveMessage(threadTs, message);
 
-        const responseText = await openai.createChat(thread);
+        const messageHistory = await getMessages(threadTs);
+
+        logger.log("Thread:", messageHistory);
+        const responseText = await openai.createChat(messageHistory) as string;
         const response = {
             text: responseText,
             thread_ts: event.thread_ts || event.ts,
         }
         try {
             await say(response);
+            const ts = timestamp();
             logger.log(`Message sent: ${responseText}`)
+            const messageResponse: SlackMessage = {
+                channel: event.channel,
+                text: responseText,
+                user: 'bot',
+                ts
+            }
+
+            await saveMessage(threadTs, messageResponse);
+
+            logger.log("Response saved to Firestore:", message);
         } catch (error) {
             console.error("Error sending message:", error, responseText);
-        }
-    });
-
-    app.event("message", async ({ event }: SlackEventMiddlewareArgs<"message">) => {
-        logger.log("Message event:", event);
-        if ("text" in event && "user" in event) {
-            let threadTs: string;
-            if ("thread_ts" in event) {
-                threadTs = event.thread_ts as string;
-            } else {
-                threadTs = event.ts;
-            }
-            const slackMessage: SlackMessage = {
-                ts: event.ts,
-                channel: event.channel,
-                text: event.text as string,
-                user: event.user,
-            };
-            logger.log("Saving message:", slackMessage);
-            await saveMessage(threadTs, slackMessage);
         }
     });
 
@@ -75,7 +67,6 @@ export const initializeSlackApp = (token: string, signingSecret: string, openAiK
                 userId: event.user,
                 reaction: event.reaction,
                 messageTs: event.item.ts,
-                threadTs: event.item.ts,
             };
             logger.log("Saving reaction:", slackReaction);
             await saveReaction(slackReaction);
