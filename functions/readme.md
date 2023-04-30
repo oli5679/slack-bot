@@ -1,6 +1,6 @@
 # Slack App
 
-Learning how to create a slack app on firebae - needs to use reciever
+Learning how to deploy a slack app to GCP Firebase.
 
 ## Setup
 
