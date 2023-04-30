@@ -1,7 +1,7 @@
 import { App, ExpressReceiver, SlackEventMiddlewareArgs } from "@slack/bolt";
 import { logger } from "firebase-functions";
 
-import { SlackMessage, SlackReaction } from "./interface";
+import { Message, Reaction } from "./interfaces/slack";
 import { saveMessage, saveReaction, getMessages } from "./utils/firestore";
 import { OpenAIChat } from "./utils/create-chat";
 import { timestamp } from "./utils/timestamp";
@@ -19,7 +19,7 @@ export const initializeSlackApp = (token: string, signingSecret: string, openAiK
     logger.log("Slack app initialized");
     app.event("app_mention", async ({ event, say }: SlackEventMiddlewareArgs<"app_mention">) => {
         logger.log("app_mention event:", event);
-        const message: SlackMessage = {
+        const message: Message = {
             channel: event.channel,
             text: event.text as string,
             user: event.user,
@@ -41,7 +41,7 @@ export const initializeSlackApp = (token: string, signingSecret: string, openAiK
             await say(response);
             const ts = timestamp();
             logger.log(`Message sent: ${responseText}`)
-            const messageResponse: SlackMessage = {
+            const messageResponse: Message = {
                 channel: event.channel,
                 text: responseText,
                 user: 'bot',
@@ -62,7 +62,7 @@ export const initializeSlackApp = (token: string, signingSecret: string, openAiK
         const botId = (await botUserPromise).user_id;
         if (itemUser === botId && "ts" in event.item) {
             logger.log("Reaction added to bot message:", event)
-            const slackReaction: SlackReaction = {
+            const slackReaction: Reaction = {
                 channel: event.item.channel,
                 userId: event.user,
                 reaction: event.reaction,

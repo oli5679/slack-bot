@@ -1,11 +1,11 @@
-export interface SlackMessage {
+export interface Message {
     ts: string;
     channel: string;
     text: string;
     user?: string;
 }
 
-export interface SlackReaction {
+export interface Reaction {
     channel: string;
     userId: string;
     reaction: string;
@@ -13,5 +13,5 @@ export interface SlackReaction {
 }
 
 export interface SlackThread {
-    messages: Array<SlackMessage>
+    messages: Array<Message>
 }
