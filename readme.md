@@ -4,7 +4,7 @@ Learning how to deploy a Slack app to GCP Firebase. This one lets you chat using
 
 It relies on using bolts `ExpressReceiver`, to work in functions, and specifying secrets, including keys, using `functions.config()`. 
 
-[WIP] - want to add more testing, and add more prompts and historic to the bot-chat.  
+[WIP] - want to add more testing, and add more prompts and historic context to the bot-chat.  
 
 ## Setup
 
