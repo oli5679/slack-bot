@@ -1,6 +1,6 @@
 # Slack App
 
-Learning how to deploy a slack app to GCP Firebase.
+Learning how to deploy a slack app to GCP Firebase. This one lets you chat to open-ai API from within your slack instance, and saves all the messages to collect feedback. 
 
 ## Setup
 
